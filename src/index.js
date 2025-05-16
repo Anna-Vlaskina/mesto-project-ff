@@ -2,13 +2,13 @@
 import './pages/index.css';
 import { initialCards } from './components/cards.js';
 import { openModal, closeModal } from './components/modal.js';
-import { createNewСard, deleteCard, likeCard } from './components/card.js';
+import { buildCardElement, deleteCard, likeCard } from './components/card.js';
 
 
 
-export const cardTemplateContent = document.querySelector('#card-template').content;
-export const cardsContainer = document.querySelector('.places__list');
+const cardTemplateContent = document.querySelector('#card-template').content;
 const cardElement = cardTemplateContent.querySelector('.card');
+const cardsContainer = document.querySelector('.places__list');
 
 const profileEditButton = document.querySelector('.profile__edit-button');
 const popupTypeEdit = document.querySelector('.popup_type_edit');
@@ -20,6 +20,10 @@ const profileInfo = document.querySelector('.content .profile .profile__info');
 const profileTitle = profileInfo.querySelector('.profile__title');
 const profileDescription = profileInfo.querySelector('.profile__description');
 
+const popupTypeImage = document.querySelector('.popup_type_image');
+const popupImage = popupTypeImage.querySelector('.popup__image');
+const popupTypeImageCaption = popupTypeImage.querySelector('.popup__caption');
+
 const profileAddButton = document.querySelector('.profile__add-button');
 const popupTypeNewCard = document.querySelector('.popup_type_new-card');
 
@@ -29,22 +33,22 @@ const popupFormTypeNewCard = popupTypeNewCard.querySelector('.popup__content .po
 
 
 
-export function buildCardElement(cardTemplateContent, deleteCard, likeCard, openImage, cardData) {
-  const cardElement = cardTemplateContent.querySelector('.card').cloneNode(true);
-  const cardImage = cardElement.querySelector('.card__image');
-  const cardLikeButton = cardElement.querySelector('.card__like-button');
-  const buttonDelete = cardElement.querySelector('.card__delete-button');
+function createNewСard(event, nameInput, urlInput, popupElement) {
+  event.preventDefault();
+  const valueNameCardInput = nameInput.value;
+  const valueUrlInput = urlInput.value;
 
-  cardImage.src = cardData.link;
-  cardImage.alt = cardData.name;
-  cardElement.querySelector('.card__title').textContent = cardData.name;
-  
-  buttonDelete.addEventListener('click', deleteCard);
-  cardLikeButton.addEventListener('click', likeCard);
-  cardImage.addEventListener('click', openImage);
+  const newCardData = {
+    name: valueNameCardInput,
+    link: valueUrlInput
+  };
 
-  return cardElement;
-};
+  const cardElement = buildCardElement(cardTemplateContent, deleteCard, likeCard, openImage, newCardData);
+  cardsContainer.prepend(cardElement);
+
+  closeModal(popupElement);
+  event.target.reset();
+}
 
 function appendCard(cardData) {
   const newCard = buildCardElement(cardTemplateContent, deleteCard, likeCard, openImage, cardData);
@@ -53,23 +57,19 @@ function appendCard(cardData) {
 
 initialCards.forEach(appendCard);
 
-export function openImage(event) {
-  const popupTypeImage = document.querySelector('.popup_type_image');
-  const popupImage = popupTypeImage.querySelector('.popup__image');
-  const popupCaption = popupTypeImage.querySelector('.popup__caption');
-
+function openImage(event) {
   const clickedCard = event.currentTarget;
   const imageUrl = clickedCard.src;
   const imageAlt = clickedCard.alt;
 
   popupImage.src = imageUrl;
   popupImage.alt = imageAlt;
-  popupCaption.textContent = imageAlt;
+  popupTypeImageCaption.textContent = imageAlt;
 
   openModal(popupTypeImage);
 }
 
-function handleSubmit(event, popupElement, inputName, inputJob, title, description) {
+function handleSubmitTypeEdit(event, popupElement, inputName, inputJob, title, description) {
   event.preventDefault();
 
   const valueNameInput = inputName.value;
@@ -78,8 +78,8 @@ function handleSubmit(event, popupElement, inputName, inputJob, title, descripti
   description.textContent = valueJobInput;
 
   closeModal(popupElement);
-  inputName.value = '';
-  inputJob.value = '';
+  inputName.value = profileTitle.textContent;
+  inputJob.value = profileDescription.textContent;
 }
 
 
@@ -87,7 +87,7 @@ function handleSubmit(event, popupElement, inputName, inputJob, title, descripti
 profileEditButton.addEventListener('click', () => openModal(popupTypeEdit));
 
 popupFormTypeEdit.addEventListener('submit', (event) => {
-  handleSubmit(event, popupTypeEdit, nameInput, jobInput, profileTitle, profileDescription);
+  handleSubmitTypeEdit(event, popupTypeEdit, nameInput, jobInput, profileTitle, profileDescription);
 });
 
 profileAddButton.addEventListener('click', () => openModal(popupTypeNewCard));

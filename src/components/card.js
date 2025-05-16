@@ -1,28 +1,20 @@
 
-import { initialCards } from './cards.js';
-import { closeModal } from './modal.js';
-import { buildCardElement, cardTemplateContent, openImage, cardsContainer } from '../index.js';
+export function buildCardElement(cardTemplateContent, deleteCard, likeCard, openImage, cardData) {
+  const cardElement = cardTemplateContent.querySelector('.card').cloneNode(true);
+  const cardImage = cardElement.querySelector('.card__image');
+  const cardLikeButton = cardElement.querySelector('.card__like-button');
+  const buttonDelete = cardElement.querySelector('.card__delete-button');
 
-export function createNewСard(event, nameInput, urlInput, popupElement) {
-  event.preventDefault();
-  const valueNameCardInput = nameInput.value;
-  const valueUrlInput = urlInput.value;
+  cardImage.src = cardData.link;
+  cardImage.alt = cardData.name;
+  cardElement.querySelector('.card__title').textContent = cardData.name;
+  
+  buttonDelete.addEventListener('click', deleteCard);
+  cardLikeButton.addEventListener('click', likeCard);
+  cardImage.addEventListener('click', openImage);
 
-  const newCardData = {
-    name: valueNameCardInput,
-    link: valueUrlInput
-  };
-
-  initialCards.unshift(newCardData);
-
-  const cardElement = buildCardElement(cardTemplateContent, deleteCard, likeCard, openImage, newCardData);
-
-  cardsContainer.prepend(cardElement);
-
-  closeModal(popupElement);
-  nameInput.value = '';
-  urlInput.value = '';
-}
+  return cardElement;
+};
 
 export function deleteCard(event) {
   const clickedDeleteButton = event.currentTarget;

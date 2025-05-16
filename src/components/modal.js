@@ -6,19 +6,16 @@ export function openModal(popupElement) {
 
   const closeButton = popupElement.querySelector('.popup__close');
   if (closeButton) {
-    closeButton.addEventListener('click', () => closeModal(popupElement));
+    popupElement._closeButtonHandler = () => {
+      closeModal(popupElement);
+    };
+    closeButton.addEventListener('click', popupElement._closeButtonHandler);
   }
 }
 
 export function closeModal(popupElement) {
   popupElement.classList.remove('popup_is-opened');
-  popupElement.removeEventListener('click', handleOverlayClick);
   document.removeEventListener('keydown', handleEscapeKey);
-
-  const closeButton = popupElement.querySelector('.popup__close');
-  if (closeButton) {
-    closeButton.removeEventListener('click', () => closeModal(popupElement));
-  }
 }
 
 function handleOverlayClick(event) {
