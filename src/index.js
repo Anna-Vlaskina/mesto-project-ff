@@ -31,6 +31,8 @@ const nameCardInput = popupTypeNewCard.querySelector('.popup__input_type_card-na
 const urlCardInput = popupTypeNewCard.querySelector('.popup__input_type_url');
 const popupFormTypeNewCard = popupTypeNewCard.querySelector('.popup__content .popup__form');
 
+const closeButtons = document.querySelectorAll('.popup__close');
+
 
 
 function createNewСard(event, nameInput, urlInput, popupElement) {
@@ -82,6 +84,19 @@ function handleSubmitTypeEdit(event, popupElement, inputName, inputJob, title, d
   inputJob.value = profileDescription.textContent;
 }
 
+function handleOverlayClick(event) {
+  if (event.target === event.currentTarget) {
+    closeModal(event.currentTarget);
+  }
+}
+
+closeButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const popup = button.closest('.popup');
+    closeModal(popup);
+  });
+});
+
 
 
 profileEditButton.addEventListener('click', () => openModal(popupTypeEdit));
@@ -95,3 +110,9 @@ profileAddButton.addEventListener('click', () => openModal(popupTypeNewCard));
 popupFormTypeNewCard.addEventListener('submit', (event) => {
   createNewСard(event, nameCardInput, urlCardInput, popupTypeNewCard);
 });
+
+popupTypeNewCard.addEventListener('click', handleOverlayClick);
+
+popupTypeEdit.addEventListener('click', handleOverlayClick);
+popupTypeImage.addEventListener('click', handleOverlayClick);
+popupTypeNewCard.addEventListener('click', handleOverlayClick);
