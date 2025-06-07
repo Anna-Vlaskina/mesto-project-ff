@@ -1,6 +1,4 @@
 
-
-
 export function buildCardElement(cardTemplateContent, deleteCard, handleDeleteCardClick, likeCard, removeLike, addLike, openImage, cardData, meId) {
   const cardElement = cardTemplateContent.querySelector('.card').cloneNode(true);
   const cardImage = cardElement.querySelector('.card__image');
@@ -14,15 +12,10 @@ export function buildCardElement(cardTemplateContent, deleteCard, handleDeleteCa
 
   cardElement.querySelector('.card__title').textContent = cardData.name;
   const likes = cardData.likes.length;
-
-  
     
   if (likesCountElement) {
     likesCountElement.textContent = likes;
   }
-
-  
-
 
   if (meId !== false) {
     const ownerId = cardData.owner._id;
@@ -30,7 +23,7 @@ export function buildCardElement(cardTemplateContent, deleteCard, handleDeleteCa
       buttonDelete.classList.toggle('card__delete-button-hide');
     }
   }
-    
+
   const likesData = cardData.likes;
 
   if (likesData.some(user => user._id === meId)) {
@@ -57,7 +50,6 @@ export function deleteCard(event, handleDeleteCardClick) {
 }
 
 export function likeCard(event, removeLike, addLike) {
-
   const clickedLikeButton = event.currentTarget;
   const card = clickedLikeButton.closest('.card');
   const likesCountElement = card.querySelector('.card__likes-count');
