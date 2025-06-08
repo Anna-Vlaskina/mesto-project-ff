@@ -8,9 +8,7 @@ import {
   fetchUserData, 
   fetchInitialCards, 
   updateProfileOnServer, 
-  getProfileFromServer, 
   addNewCard, 
-  getCardFromServer,
   handleDeleteCardClick, 
   removeLike, 
   addLike,
@@ -29,9 +27,9 @@ const nameInput = popupTypeEdit.querySelector('.popup__input_type_name');
 const jobInput = popupTypeEdit.querySelector('.popup__input_type_description');
 
 const profileInfo = document.querySelector('.content .profile .profile__info');
-export const profileTitle = profileInfo.querySelector('.profile__title');
-export const profileDescription = profileInfo.querySelector('.profile__description');
-export const profileImage = document.querySelector('.content .profile .profile__image');
+const profileTitle = profileInfo.querySelector('.profile__title');
+const profileDescription = profileInfo.querySelector('.profile__description');
+const profileImage = document.querySelector('.content .profile .profile__image');
 
 const popupTypeImage = document.querySelector('.popup_type_image');
 const popupImage = popupTypeImage.querySelector('.popup__image');
@@ -45,7 +43,6 @@ const nameCardInput = popupTypeNewCard.querySelector('.popup__input_type_card-na
 const urlCardInput = popupTypeNewCard.querySelector('.popup__input_type_url');
 
 const closeButtons = document.querySelectorAll('.popup__close');
-// const saveButtons = document.querySelectorAll('.popup__button');
 
 const popupTypeAvatar = document.querySelector('.popup_type_avatar');
 const popupFormTypeAvatar = popupTypeAvatar.querySelector('.popup__content .popup__form');
@@ -55,36 +52,48 @@ const urlInput = popupFormTypeAvatar.querySelector('.popup__input_type_url');
 // Валидация форм
 enableValidation(validationConfig);
 
-// Массив информации о пользователе
-fetchUserData();
+// Массив информации о пользователе и карточек
+Promise.all([fetchUserData(), fetchInitialCards()])
+  .then(([userData, initialCardsFetch]) => {
+    console.log(userData);
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
 
-// Массив карточек
-fetchInitialCards();
+    console.log(userData.avatar);
+    console.log(profileImage.src);
+
+    profileImage.style.backgroundImage = `url(${userData.avatar})`;
+
+    const meId = userData._id
+
+    console.log(initialCardsFetch);
+    initialCardsFetch.forEach(card => appendCard(card, meId));
+});
 
 // Заполнение информации пользователя
-async function handleSubmitTypeEdit(event, popupElement, inputName, inputJob, title, description) {
+async function handleSubmitTypeEdit(event) {
   event.preventDefault();
   
-  const submitButton = event.submitter; // Получаем кнопку отправки формы
-  const valueNameInput = inputName.value;
-  const valueJobInput = inputJob.value;
+  const submitButton = event.submitter;
+  const valueNameInput = nameInput.value;
+  const valueJobInput = jobInput.value;
 
   try {
     submitButton.textContent = 'Сохранение...';
     submitButton.disabled = true;
 
-    await updateProfileOnServer(valueNameInput, valueJobInput)
-    .then(() => {
-      getProfileFromServer()
-    .then(data => {
-        console.log('Полученные данные:', data);
-      });
-    });
+    const updatedData = await updateProfileOnServer(valueNameInput, valueJobInput);
+    const serverData = await fetchUserData();
 
-    title.textContent = valueNameInput;
-    description.textContent = valueJobInput;
+    profileTitle.textContent = serverData.name || valueNameInput;
+    profileDescription.textContent = serverData.about || valueJobInput;
 
-    closeModal(popupElement);
+    nameInput.value = serverData.name || valueNameInput;
+    jobInput.value = serverData.about || valueJobInput;
+
+    closeModal(popupTypeEdit);
+
+    console.log('Данные успешно обновлены:', serverData);
 
   } catch (error) {
     console.error('Ошибка при обновлении профиля:', error);
@@ -148,9 +157,6 @@ async function createNewСard(event, nameInput, urlInput, popupElement) {
     closeModal(popupElement);
     event.target.reset();
 
-    const freshData = await getCardFromServer();
-    console.log('Полученные данные:', freshData);
-
   } catch (error) {
     console.error('Ошибка при обновлении аватара:', error);
     
@@ -161,7 +167,7 @@ async function createNewСard(event, nameInput, urlInput, popupElement) {
 }
 
 // Добавление карточки на страницу
-export function appendCard(cardData, meId) {
+function appendCard(cardData, meId) {
   const newCard = buildCardElement(cardTemplateContent, deleteCard, handleDeleteCardClick, likeCard, removeLike, addLike, openImage, cardData, meId);
   cardsContainer.appendChild(newCard);
 }
@@ -229,7 +235,7 @@ popupTypeAvatar.addEventListener('click', handleOverlayClick);
 
 // Отправка формы информации о пользователе
 popupFormTypeEdit.addEventListener('submit', (event) => {
-  handleSubmitTypeEdit(event, popupTypeEdit, nameInput, jobInput, profileTitle, profileDescription);
+  handleSubmitTypeEdit(event);
 });
 
 // Отправка формы новой карточки

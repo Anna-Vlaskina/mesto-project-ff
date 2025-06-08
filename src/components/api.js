@@ -1,6 +1,4 @@
 
-import { profileTitle, profileDescription, profileImage, appendCard } from '../index';
-
 const config = {
   baseUrl: 'https://nomoreparties.co/v1/wff-cohort-39',
   headers: {
@@ -41,14 +39,6 @@ export const updateProfileOnServer = (name, about) => {
   .then(handleResponse);
 };
 
-export const getProfileFromServer = () => {
-  return fetch(`${config.baseUrl}/users/me`, {
-    method: 'GET',
-    headers: config.headers
-  })
-  .then(handleResponse);
-};
-
 export const addNewCard = (nameCard, srcCard) => {
   return fetch(`${config.baseUrl}/cards`, {
     method: 'POST',
@@ -57,14 +47,6 @@ export const addNewCard = (nameCard, srcCard) => {
       name: nameCard,
       link: srcCard
     })
-  })
-  .then(handleResponse);
-};
-
-export const getCardFromServer = () => {
-  return fetch(`${config.baseUrl}/cards`, {
-    method: 'GET',
-    headers: config.headers
   })
   .then(handleResponse);
 };
@@ -101,20 +83,3 @@ export const updateProfileAvatar = (avatar) => {
   })
   .then(handleResponse);
 };
-
-Promise.all([fetchUserData(), fetchInitialCards()])
-  .then(([userData, initialCardsFetch]) => {
-    console.log(userData);
-    profileTitle.textContent = userData.name;
-    profileDescription.textContent = userData.about;
-
-    console.log(userData.avatar);
-    console.log(profileImage.src);
-
-    profileImage.style.backgroundImage = `url(${userData.avatar})`;
-
-    const meId = userData._id
-
-    console.log(initialCardsFetch);
-    initialCardsFetch.forEach(card => appendCard(card, meId));
-});
