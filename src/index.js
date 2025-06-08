@@ -83,20 +83,20 @@ async function handleSubmitTypeEdit(event) {
     submitButton.disabled = true;
 
     const updatedData = await updateProfileOnServer(valueNameInput, valueJobInput);
-    const serverData = await fetchUserData();
 
-    profileTitle.textContent = serverData.name || valueNameInput;
-    profileDescription.textContent = serverData.about || valueJobInput;
+    profileTitle.textContent = updatedData.name;
+    profileDescription.textContent = updatedData.about;
 
-    nameInput.value = serverData.name || valueNameInput;
-    jobInput.value = serverData.about || valueJobInput;
+    nameInput.value = updatedData.name;
+    jobInput.value = updatedData.about;
 
     closeModal(popupTypeEdit);
 
-    console.log('Данные успешно обновлены:', serverData);
+    console.log('Данные успешно обновлены:', updatedData);
 
   } catch (error) {
     console.error('Ошибка при обновлении профиля:', error);
+
   } finally {
     submitButton.textContent = 'Сохранить';
     submitButton.disabled = false;
